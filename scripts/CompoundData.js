@@ -17,22 +17,21 @@ const CompoundComptrollerContract = new web3.eth.Contract(
 
 const CompoundTokenABI = require("../ABIs/CompoundTokenABI.json");
 
-const RandomUserAddress = "0x145b0F174ffAE565aFcdbc155e1fCb9CEF78E40D";
+const RandomUserAddress = "0xdD2FD4581271e230360230F9337D5c0430Bf44C0";
 
 async function GetCompundData() {
   const tokenAddr = await CompoundComptrollerContract.methods
     .getAllMarkets()
     .call();
-
+  const uData = await CompoundResolverContract.methods
+    .getPosition(RandomUserAddress, tokenAddr)
+    .call();
   let userData = [];
 
   for (let i = 0; i < tokenAddr.length; i++) {
     let dataForToken = {};
 
-    const cd = await CompoundResolverContract.methods
-      .getCompoundData(RandomUserAddress, [tokenAddr[i]])
-      .call();
-    const compData = cd[0];
+    const compData = uData[0][i];
 
     const CompoundTokenAddress = tokenAddr[i];
     const CompoundTokenContract = new web3.eth.Contract(
@@ -122,14 +121,20 @@ async function GetCompundData() {
     //borrow enabled
     dataForToken.borrowEnabled = !compData.isBorrowPaused;
     //comp Supply Apy
-    const comp_usd_price = dataForToken.priceInUSD;
-    borrowCompApy = 100 * (Math.pow((1 + (comp_usd_price * borrower_daily_comp / (total_borrows * asset_usd_price))), 365) - 1);
+
     //comp Borrow Apy
 
     console.log(dataForToken);
-    userData.push(dataForToken);
   }
-  //console.log(userData);
+  userData.balance = new BigNumber(uData[1].balance.toString())
+    .div(1e18)
+    .toString();
+  userData.votes = uData[1].votes;
+  userData.delegate = uData[1].delegate;
+  userData.allocated = new BigNumber(uData[1].allocated.toString())
+    .div(1e18)
+    .toString();
+  console.log(userData);
 }
 
 GetCompundData();
