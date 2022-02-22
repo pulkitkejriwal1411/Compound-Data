@@ -15,7 +15,7 @@ const CompoundComptrollerContract = new web3.eth.Contract(
   CompoundComptrollerAddress
 );
 
-const CompoundTokenABI = require("../ABIs/ERC20TokenABI.json");
+const ERC20TokenABI = require("../ABIs/ERC20TokenABI.json");
 
 const RandomUserAddress = "0xdD2FD4581271e230360230F9337D5c0430Bf44C0";
 
@@ -36,7 +36,7 @@ async function GetCompundData() {
     userData.totalBorrowInETH= 0;
     const CompoundTokenAddress = tokenAddr[i];
     const CompoundTokenContract = new web3.eth.Contract(
-      CompoundTokenABI,
+      ERC20TokenABI,
       CompoundTokenAddress
     );
     const ctokenKey = await CompoundTokenContract.methods.symbol().call();
