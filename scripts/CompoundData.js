@@ -27,12 +27,13 @@ async function GetCompundData() {
     .getPosition(RandomUserAddress, tokenAddr)
     .call();
   let userData = [];
-
+  let factorForETH ;
   for (let i = 0; i < tokenAddr.length; i++) {
     let dataForToken = {};
 
     const compData = uData[0][i];
-
+    userData.totalSupplyInETH= 0;
+    userData.totalBorrowInETH= 0;
     const CompoundTokenAddress = tokenAddr[i];
     const CompoundTokenContract = new web3.eth.Contract(
       CompoundTokenABI,
@@ -70,7 +71,7 @@ async function GetCompundData() {
       .div(1e18)
       .toString();
     //supply
-
+    dataForToken.supply = dataForToken.ctknBalance; 
     //borrow
     dataForToken.borrow = new BigNumber(
       compData.borrowBalanceStoredUser.toString()
@@ -125,12 +126,19 @@ async function GetCompundData() {
     //comp Borrow Apy
 
     console.log(dataForToken);
+
+    //general calculation
+    userData.totalSupplyInETH= Number(dataForToken.supply) *Number(dataForToken.priceInETH);
+    userData.totalBorrowInETH= Number(dataForToken.borrow) *Number(dataForToken.priceInETH);
+    if(dataForToken.key === 'ETH')
+    factorForETH = dataForToken.factor;
   }
+  userData.maxBorrowLimitInETH = Number(factorForETH) * userData.totalSupplyInETH;
   userData.balance = new BigNumber(uData[1].balance.toString())
     .div(1e18)
     .toString();
-  userData.votes = uData[1].votes;
-  userData.delegate = uData[1].delegate;
+  userData.compVotes = uData[1].votes;
+  userData.compDelegate = uData[1].delegate;
   userData.allocated = new BigNumber(uData[1].allocated.toString())
     .div(1e18)
     .toString();
