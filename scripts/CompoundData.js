@@ -27,13 +27,14 @@ async function GetCompundData() {
     .getPosition(RandomUserAddress, tokenAddr)
     .call();
   let userData = [];
-  let factorForETH ;
+  userData.totalSupplyInETH= 0;
+  userData.totalBorrowInETH= 0;
+  userData.maxBorrowLimitInETH = 0;
   for (let i = 0; i < tokenAddr.length; i++) {
     let dataForToken = {};
 
     const compData = uData[0][i];
-    userData.totalSupplyInETH= 0;
-    userData.totalBorrowInETH= 0;
+    
     const CompoundTokenAddress = tokenAddr[i];
     const CompoundTokenContract = new web3.eth.Contract(
       ERC20TokenABI,
@@ -130,10 +131,9 @@ async function GetCompundData() {
     //general calculation
     userData.totalSupplyInETH= Number(dataForToken.supply) *Number(dataForToken.priceInETH);
     userData.totalBorrowInETH= Number(dataForToken.borrow) *Number(dataForToken.priceInETH);
-    if(dataForToken.key === 'ETH')
-    factorForETH = dataForToken.factor;
+    userData.maxBorrowLimitInETH = Number(dataForToken.supply) * Number(dataForToken.factor);
   }
-  userData.maxBorrowLimitInETH = Number(factorForETH) * userData.totalSupplyInETH;
+ 
   userData.balance = new BigNumber(uData[1].balance.toString())
     .div(1e18)
     .toString();
