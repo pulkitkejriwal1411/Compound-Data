@@ -129,9 +129,9 @@ async function GetCompundData() {
     console.log(dataForToken);
 
     //general calculation
-    userData.totalSupplyInETH= Number(dataForToken.supply) *Number(dataForToken.priceInETH);
-    userData.totalBorrowInETH= Number(dataForToken.borrow) *Number(dataForToken.priceInETH);
-    userData.maxBorrowLimitInETH = Number(dataForToken.supply) * Number(dataForToken.factor);
+    userData.totalSupplyInETH+= Number(dataForToken.supply) *Number(dataForToken.priceInETH);
+    userData.totalBorrowInETH+= Number(dataForToken.borrow) *Number(dataForToken.priceInETH);
+    userData.maxBorrowLimitInETH+= Number(dataForToken.supply) * Number(dataForToken.factor);
   }
  
   userData.balance = new BigNumber(uData[1].balance.toString())
